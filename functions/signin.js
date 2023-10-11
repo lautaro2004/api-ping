@@ -4,11 +4,12 @@ const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 const db = require('../db.js');
 const router = express.Router();
-require('dotenv').config();
 
 
 // Generar una clave secreta para JWT
-const secretKey = process.env.JWT_SECRET; // Usa la clave secreta de tu entorno en Railway
+const secretKey = uuidv4();
+console.log('JWT_SECRET:', secretKey);
+// Asegúrate de configurar la misma clave en tu variable de entorno "JWT_SECRET"
 
 router.post('/', async (req, res) => {
   const { username, password } = req.body;
