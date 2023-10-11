@@ -69,7 +69,7 @@ router.get('/images/:postId', async (req, res) => {
       const imagePath = results[0].post_img;
       if (imagePath) {
         // Asegúrate de que la ruta relativa sea correcta
-        const relativePath = `uploads/${imagePath}`;
+        const relativePath = `${imagePath}`;
         res.sendFile(path.join(__dirname, '..', relativePath));
       } else {
         res.status(404).json({ message: 'Post no encontrado' });
