@@ -45,16 +45,19 @@ app.use('/posts', renderPost);
 app.use('/posts', LikesPosts);
 app.use('/search', SearchUsers);
 app.use('/user', RenderUsers);
-app.get('/get-user-data', (req, res) => {
-  const { user_id } = req.query; // Obtiene el user_id de la consulta
+app.get('/get-user-data', async (req, res) => {
+  const { user_id } = req.query;
 
-  // Llama a la función `getUserData` para obtener los datos del usuario
-  const userDataResult = userData.getUserData(user_id);
-
-  if (userDataResult) {
-    res.status(200).json(userDataResult); // Envía los datos del usuario como respuesta
-  } else {
-    res.status(404).json({ error: 'Usuario no encontrado' });
+  try {
+    const userData = await userData.getUserData(user_id);
+    if (userData) {
+      res.status(200).json(userData);
+    } else {
+      res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+  } catch (error) {
+    console.error('Error al obtener los datos del usuario:', error);
+    res.status(500).json({ message: 'Error al obtener los datos del usuario' });
   }
 });
 
