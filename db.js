@@ -2,10 +2,10 @@ const mysql = require("mysql2");
 
 // Configurar la conexión a la base de datos MySQL
 const connection = mysql.createConnection({
-  host: "localhost",
+  host: "containers-us-west-148.railway.app",
   user: "root",
-  password: "1234",
-  database: "ping",
+  password: "14SBVKdnqPBJQ28qtvdj",
+  database: "railway",
 });
 
 // Establecer la conexión a la base de datos
