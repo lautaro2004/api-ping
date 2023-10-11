@@ -5,55 +5,55 @@ const db = require('../db');
 const router = express.Router();
 
 // Ruta para obtener todos los posts con la información de los usuarios y los comentarios
-router.get('/', (req, res) => {
-  const sql = `
-  SELECT
-      post.post_id,
-      post.user_id,
-      post.post_text,
-      post.post_img,
-      COUNT(likes.post_id) AS num_likes,
-      COUNT(comments.comment_id) AS num_comments,
-      post.create_att,
-      users.username,
-      users.profile_photo
-    FROM
-      post
-    JOIN
-      users ON post.user_id = users.user_id
-    LEFT JOIN
-      likes ON post.post_id = likes.post_id
-    LEFT JOIN
-      comments ON post.post_id = comments.post_id
-    GROUP BY
-      post.post_id,
-      post.user_id,
-      post.post_text,
-      post.post_img,
-      post.create_att,
-      users.username,
-      users.profile_photo
-    ORDER BY post.create_att DESC`;
+router.get('/', async (req, res) => {
+  try {
+    const sql = `
+    SELECT
+        post.post_id,
+        post.user_id,
+        post.post_text,
+        post.post_img,
+        COUNT(likes.post_id) AS num_likes,
+        COUNT(comments.comment_id) AS num_comments,
+        post.created_at,
+        users.username,
+        users.profile_photo
+      FROM
+        post
+      JOIN
+        users ON post.user_id = users.user_id
+      LEFT JOIN
+        likes ON post.post_id = likes.post_id
+      LEFT JOIN
+        comments ON post.post_id = comments.post_id
+      GROUP BY
+        post.post_id,
+        post.user_id,
+        post.post_text,
+        post.post_img,
+        post.created_at,
+        users.username,
+        users.profile_photo
+      ORDER BY post.created_at DESC`;
 
-  db.query(sql, (error, results) => {
-    if (error) {
-      console.error('Error al obtener los posts:', error);
-      res.status(500).json({ message: 'Error al obtener los posts' });
-    } else {
-      console.log('Posts obtenidos de la base de datos');
+    const [results, fields] = await db.query(sql);
 
-      // Construir la URL completa de la foto de perfil para cada resultado
-      const postsWithFullProfilePhotoUrl = results.map(post => ({
-        ...post,
-        profile_photo: `http://192.168.1.112:3000${post.profile_photo}`,
-        post_img: post.post_img
-          ? `http://192.168.1.112:3000/${post.post_img}`
-          : null, // Ruta relativa para la imagen del post si existe
-      }));
+    console.log('Posts obtenidos de la base de datos');
 
-      res.status(200).json(postsWithFullProfilePhotoUrl);
-    }
-  });
+    // Construir la URL completa de la foto de perfil para cada resultado
+    const postsWithFullProfilePhotoUrl = results.map(post => ({
+      ...post,
+      profile_photo: `https://ping-api-70i8.onrender.com/profiles_pictures${post.profile_photo}`,
+      post_img: post.post_img
+        ? `https://ping-api-70i8.onrender.com/${post.post_img}`
+        : null, // Ruta relativa para la imagen del post si existe
+    }));
+
+    res.status(200).json(postsWithFullProfilePhotoUrl);
+  } catch (error) {
+    console.error('Error al obtener los posts:', error);
+    res.status(500).json({ message: 'Error al obtener los posts' });
+  }
 });
 
 // Ruta para obtener la imagen de un post por su ID
@@ -85,6 +85,7 @@ router.get('/images/:postId', (req, res) => {
 });
 
 module.exports = router;
+
 
 
 
