@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
         post.post_img,
         COUNT(likes.post_id) AS num_likes,
         COUNT(comments.comment_id) AS num_comments,
-        post.created_at,
+        post.create_att,
         users.username,
         users.profile_photo
       FROM
@@ -30,10 +30,10 @@ router.get('/', async (req, res) => {
         post.user_id,
         post.post_text,
         post.post_img,
-        post.created_at,
+        post.create_att,
         users.username,
         users.profile_photo
-      ORDER BY post.created_at DESC`;
+      ORDER BY post.create_att DESC`;
 
     const [results, fields] = await db.execute(sql);
 
