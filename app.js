@@ -9,6 +9,7 @@ const renderPost = require('./functions/renderPost.js');
 const LikesPosts = require('./functions/LikesPost.js');
 const SearchUsers = require('./functions/searchUsers.js');
 const RenderUsers = require('./functions/RenderUsers.js');
+const userData = require('./functions/getUserData.js'); // Importa el módulo userData
 const app = express();
 app.use(cors());
 
@@ -47,14 +48,11 @@ app.use('/user', RenderUsers);
 app.get('/get-user-data', (req, res) => {
   const { user_id } = req.query; // Obtiene el user_id de la consulta
 
-  // Realiza una consulta a tu base de datos para obtener los datos del usuario
-  // Reemplaza esta parte con tu lógica para obtener los datos del usuario
+  // Llama a la función `getUserData` para obtener los datos del usuario
+  const userDataResult = userData.getUserData(user_id);
 
-  // Supongamos que tienes una función `getUserData` para obtener los datos del usuario
-  const userData = getUserData(user_id);
-
-  if (userData) {
-    res.status(200).json(userData); // Envía los datos del usuario como respuesta
+  if (userDataResult) {
+    res.status(200).json(userDataResult); // Envía los datos del usuario como respuesta
   } else {
     res.status(404).json({ error: 'Usuario no encontrado' });
   }
