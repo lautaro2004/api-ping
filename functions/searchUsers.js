@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require("../db.js");
+require('dotenv').config();
+
 
 // Ruta para buscar usuarios
 router.get('/', (req, res) => {

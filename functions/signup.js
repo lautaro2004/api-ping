@@ -2,6 +2,8 @@ const express = require("express");
 const db = require("../db.js");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
+require('dotenv').config();
+
 
 const router = express.Router();
 

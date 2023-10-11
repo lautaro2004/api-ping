@@ -1,6 +1,6 @@
 const express = require('express');
 const db = require('../db');
-
+require('dotenv').config();
 const router = express.Router();
 
 // Ruta para obtener todos los posts con la información de los usuarios y los comentarios
