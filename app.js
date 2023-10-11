@@ -44,6 +44,21 @@ app.use('/posts', renderPost);
 app.use('/posts', LikesPosts);
 app.use('/search', SearchUsers);
 app.use('/user', RenderUsers);
+app.get('/get-user-data', (req, res) => {
+  const { user_id } = req.query; // Obtiene el user_id de la consulta
+
+  // Realiza una consulta a tu base de datos para obtener los datos del usuario
+  // Reemplaza esta parte con tu lógica para obtener los datos del usuario
+
+  // Supongamos que tienes una función `getUserData` para obtener los datos del usuario
+  const userData = getUserData(user_id);
+
+  if (userData) {
+    res.status(200).json(userData); // Envía los datos del usuario como respuesta
+  } else {
+    res.status(404).json({ error: 'Usuario no encontrado' });
+  }
+});
 
 // Iniciar el servidor
 app.listen(3000, () => {
