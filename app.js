@@ -9,7 +9,7 @@ const renderPost = require('./functions/renderPost.js');
 const LikesPosts = require('./functions/LikesPost.js');
 const SearchUsers = require('./functions/searchUsers.js');
 const RenderUsers = require('./functions/RenderUsers.js');
-const userData = require('./functions/getUserData.js'); // Importa el módulo userData
+const getUserData = require('./functions/getUserData.js');
 const app = express();
 app.use(cors());
 
@@ -45,21 +45,7 @@ app.use('/posts', renderPost);
 app.use('/posts', LikesPosts);
 app.use('/search', SearchUsers);
 app.use('/user', RenderUsers);
-app.get('/get-user-data', async (req, res) => {
-  const { user_id } = req.query;
-
-  try {
-    const userData = await userData.getUserData(user_id);
-    if (userData) {
-      res.status(200).json(userData);
-    } else {
-      res.status(404).json({ error: 'Usuario no encontrado' });
-    }
-  } catch (error) {
-    console.error('Error al obtener los datos del usuario:', error);
-    res.status(500).json({ message: 'Error al obtener los datos del usuario' });
-  }
-});
+app.use('/get-user-data', getUserData);
 
 // Iniciar el servidor
 app.listen(3000, () => {
