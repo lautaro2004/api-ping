@@ -1,5 +1,4 @@
 const express = require('express');
-const path = require('path');
 const db = require('../db');
 
 const router = express.Router();
@@ -36,14 +35,14 @@ router.get('/', async (req, res) => {
         users.profile_photo
       ORDER BY post.created_at DESC`;
 
-    const [results, fields] = await db.query(sql);
+    const [results, fields] = await db.execute(sql);
 
     console.log('Posts obtenidos de la base de datos');
 
     // Construir la URL completa de la foto de perfil para cada resultado
     const postsWithFullProfilePhotoUrl = results.map(post => ({
       ...post,
-      profile_photo: `https://ping-api-70i8.onrender.com/profiles_pictures${post.profile_photo}`,
+      profile_photo: `https://ping-api-70i8.onrender.com/profiles_pictures/${post.profile_photo}`,
       post_img: post.post_img
         ? `https://ping-api-70i8.onrender.com/${post.post_img}`
         : null, // Ruta relativa para la imagen del post si existe
@@ -57,31 +56,30 @@ router.get('/', async (req, res) => {
 });
 
 // Ruta para obtener la imagen de un post por su ID
-router.get('/images/:postId', (req, res) => {
+router.get('/images/:postId', async (req, res) => {
   const postId = req.params.postId;
 
-  // Obtener la ruta de la imagen desde la base de datos utilizando el postId
-  const sql = 'SELECT post_img FROM post WHERE post_id = ?';
-  db.query(sql, [postId], (error, results) => {
-    if (error) {
-      console.error('Error al obtener la imagen del post:', error);
-      res.status(500).json({ message: 'Error al obtener la imagen del post' });
-    } else {
-      if (results.length > 0) {
-        const imagePath = results[0].post_img;
-        const relativePath = imagePath
-          ? `/${path.join('uploads', imagePath)}`
-          : null; // Ruta relativa para la imagen del post si existe
-        if (relativePath) {
-          res.sendFile(path.join(__dirname, '..', relativePath));
-        } else {
-          res.status(404).json({ message: 'Post no encontrado' });
-        }
+  try {
+    // Obtener la ruta de la imagen desde la base de datos utilizando el postId
+    const sql = 'SELECT post_img FROM post WHERE post_id = ?';
+    const [results, fields] = await db.execute(sql, [postId]);
+
+    if (results.length > 0) {
+      const imagePath = results[0].post_img;
+      if (imagePath) {
+        // Asegúrate de que la ruta relativa sea correcta
+        const relativePath = `uploads/${imagePath}`;
+        res.sendFile(path.join(__dirname, '..', relativePath));
       } else {
         res.status(404).json({ message: 'Post no encontrado' });
       }
+    } else {
+      res.status(404).json({ message: 'Post no encontrado' });
     }
-  });
+  } catch (error) {
+    console.error('Error al obtener la imagen del post:', error);
+    res.status(500).json({ message: 'Error al obtener la imagen del post' });
+  }
 });
 
 module.exports = router;

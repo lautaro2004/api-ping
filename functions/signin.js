@@ -6,17 +6,15 @@ const db = require('../db.js');
 const router = express.Router();
 
 // Generar una clave secreta para JWT
-const secretKey = uuidv4();
-console.log('JWT_SECRET:', secretKey);
-// Asegúrate de configurar la misma clave en tu variable de entorno "JWT_SECRET"
+const secretKey = process.env.JWT_SECRET; // Usa la clave secreta de tu entorno en Railway
 
 router.post('/', async (req, res) => {
   const { username, password } = req.body;
 
   try {
     // Verificar si el usuario existe en la base de datos
-    const results = await db.promise().query('SELECT * FROM users WHERE username = ?', [username]);
-    const user = results[0][0];
+    const [results, fields] = await db.execute('SELECT * FROM users WHERE username = ?', [username]);
+    const user = results[0];
 
     if (!user) {
       res.status(401).json({ message: 'Credenciales inválidas' });
@@ -38,7 +36,7 @@ router.post('/', async (req, res) => {
     // Generar el token de autenticación
     const token = jwt.sign(
       {
-        userId: user.id,
+        userId: user.user_id, // Asegúrate de usar el campo correcto para el ID del usuario
         sessionId,
       },
       secretKey, // Utiliza la clave secreta definida
