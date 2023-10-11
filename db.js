@@ -1,20 +1,25 @@
 const mysql = require("mysql2");
+require('dotenv').config(); // Para cargar variables de entorno desde un archivo .env
 
-// Configurar la conexión a la base de datos MySQL
-const connection = mysql.createConnection({
-  host: "containers-us-west-148.railway.app",
-  user: "root",
-  password: "14SBVKdnqPBJQ28qtvdj",
-  database: "railway",
+// Configurar el pool de conexiones a la base de datos MySQL
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT, // Si Railway proporciona un puerto específico
 });
 
 // Establecer la conexión a la base de datos
-connection.connect((error) => {
-  if (error) {
-    console.error("Error al conectar a la base de datos: " + error.stack);
-    return;
+pool.getConnection((err, connection) => {
+  if (err) {
+    console.error("Error al conectar a la base de datos: " + err.message);
+  } else {
+    console.log("Conexión a la base de datos establecida");
+    connection.release(); // Liberar la conexión para que esté disponible para otras consultas
   }
-  console.log("Conexión a la base de datos establecida");
 });
 
-module.exports = connection;
+// Exportar el pool de conexiones
+module.exports = pool.promise();
+
