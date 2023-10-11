@@ -5,7 +5,6 @@ const { v4: uuidv4 } = require('uuid');
 const db = require('../db.js');
 const router = express.Router();
 
-
 // Generar una clave secreta para JWT
 const secretKey = uuidv4();
 console.log('JWT_SECRET:', secretKey);
@@ -36,11 +35,19 @@ router.post('/', async (req, res) => {
     // Generar un identificador único para el token de sesión
     const sessionId = uuidv4();
 
-    // Generar el token de autenticación
+    // Crear un objeto que contenga los datos del usuario
+    const userData = {
+      username: user.username,
+      first_name: user.first_name,
+      last_name: user.last_name,
+    };
+
+    // Generar el token de autenticación que incluye los datos del usuario
     const token = jwt.sign(
       {
         userId: user.user_id, // Asegúrate de usar el campo correcto para el ID del usuario
         sessionId,
+        userData, // Incluye los datos del usuario en el token
       },
       secretKey, // Utiliza la clave secreta definida
       { expiresIn: '178h' } // Establece la expiración del token (ejemplo: 1 hora)
@@ -59,6 +66,7 @@ router.post('/', async (req, res) => {
 });
 
 module.exports = router;
+
 
 
 
